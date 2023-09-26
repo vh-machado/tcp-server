@@ -15,7 +15,7 @@ A seguir encontra-se o passo a passo para rodar o projeto.
 
 1. Navegue até o diretório src/main/java/com/tcpserver
 2. Insira a chave da API do The Movie Database em cada ocorrência de TMDB_API_KEY do arquivo TCPServlet.java
-3. Execute o arquivo TCPServlet.java
+3. Execute o arquivo TCPServer.java
 
 ## Rodando o cliente
 
