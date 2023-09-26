@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descubra filmes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Poppins:wght@300;400;500&display=swap');
+        
+        body {
+            color: white;
+            margin: 0;
+            background-image: linear-gradient(to top, rgba(25,21,40,1), rgba(17,14,27,1));
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        
+
+        input {
+            width: 30%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 0px solid white;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input:focus {
+            outline: 1px solid white;
+            box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.1), 0 6px 20px 0 rgba(255, 255, 255, 0.09);
+        }
+
+        button {
+            color: white;
+            font-weight: 700;
+            border: 0px;
+            border-radius: 8px;
+            background-color: #7C162E;
+            padding: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        button:hover {
+            background-color: #5a0c1e;
+        }
+
+        button:active {
+            background-color: #3f0714;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding-top: 32px;
+        }
+
+        .search-logo {
+            margin: 0;
+            margin-bottom: 16px;
+            font-family: 'Major Mono Display', monospace;
+            font-size: 24px;
+        }
+
+        /* Estilos CSS para a galeria de filmes */
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            padding-top: 24px;
+            padding-bottom: 24px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .movie {
+            width: 200px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            margin: 2px;
+        }
+
+        .movie:hover {
+            transform: translateY(-5px);
+            margin: 0px;
+            border: 2px solid rgb(240, 196, 206);
+            box-shadow: 0 4px 8px 0 rgba(124, 22, 46, 0.3), 0 6px 20px 0 rgba(124, 22, 46, 0.29);
+        }
+
+        .movie img {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .movie h3 {
+            margin: 10px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .movie-info {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .movie-year {
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="search-container">
+        <img src="./assets/pipoca.png" class="search-img">
+        <h3 class="search-logo">Descubra Filmes</h3>
+        
+        <input type="text" id="keywords" placeholder="Digite palavras-chave">
+        <button onclick="searchMovies()">Pesquisar</button>
+        <div class="gallery" id="movies-container">
+        </div>
+    </div>
+
+    <script>
+        function searchMovies() {
+            // Obter as palavras-chave do campo de entrada
+            var keywordsInput = document.getElementById("keywords");
+            var keywords = keywordsInput.value;
+
+            // Construir a URL corretamente
+            var url = `http://127.0.0.1:15000/keywords/${keywords}`;
+
+            // Enviar as palavras-chave para o servidor via uma solicitação Axios
+            axios.get(url)
+                .then(function (response) {
+                    // Verificar se o JSON é válido antes de fazer o parse
+                    var jsonResponse;
+                    try {
+                        console.log("resposta servidor:", response.data);
+                        jsonResponse = response.data;
+                    } catch (e) {
+                        console.error("Erro ao analisar JSON:", e);
+                        return;
+                    }
+
+                    // Renderizar os filmes na galeria
+                    var gallery = document.getElementById("movies-container");
+                    gallery.innerHTML = ""; // Limpar o conteúdo anterior
+
+                    if (jsonResponse && jsonResponse.movies) {
+                        var movies = jsonResponse.movies;
+
+                        movies.forEach(function (movie) {
+                            var movieDiv = document.createElement("div");
+                            movieDiv.className = "movie";
+
+                            // Renderizar o pôster do filme
+                            var posterElement = document.createElement("img");
+                            posterElement.src = "https://image.tmdb.org/t/p/original" + movie.poster_path;
+                            posterElement.alt = movie.title;
+                            movieDiv.appendChild(posterElement);
+
+                            // Renderizar o título do filme
+                            var titleElement = document.createElement("h3");
+                            titleElement.textContent = movie.title;
+                            movieDiv.appendChild(titleElement);
+
+                            // Renderizar informações adicionais do filme
+                            var movieInfoDiv = document.createElement("div");
+                            movieInfoDiv.className = "movie-info";
+
+                            // Renderizar o ano do filme
+                            var yearElement = document.createElement("span");
+                            yearElement.textContent = (movie.release_date ? movie.release_date.substring(0, 4) : "Desconhecido");
+                            yearElement.className = "movie-year";
+                            movieInfoDiv.appendChild(yearElement);
+
+                            // Adicione aqui o código para renderizar outras informações do filme, se necessário
+
+                            movieDiv.appendChild(movieInfoDiv);
+
+                            // Adicionar o filme renderizado à galeria
+                            gallery.appendChild(movieDiv);
+                        });
+                    } else {
+                        // Se não houver filmes encontrados, exiba uma mensagem
+                        gallery.textContent = "Nenhum filme encontrado para essa palavra-chave.";
+                    }
+                })
+                .catch(function (error) {
+                    // Lidar com erros de solicitação, se necessário
+                    console.error("Erro na solicitação:", error);
+                });
+        }
+    </script>
+</body>
+</html>
